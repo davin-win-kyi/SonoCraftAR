@@ -1,0 +1,121 @@
+using System.Collections.Generic;
+using Shapes;
+using System;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+
+public class SoundVisualizer : ImmediateModeShapeDrawer
+{
+    public float volume = 0.5f;
+    public float pitch = 1.0f;
+    public Color lowVolumeColor = new Color(169 / 255f, 169 / 255f, 169 / 255f); // Gray
+    public Color highVolumeColor = new Color(173 / 255f, 216 / 255f, 230 / 255f); // Light Cyan
+    public Color lowPitchColor = new Color(70 / 255f, 130 / 255f, 180 / 255f); // Steel Blue
+    public Color highPitchColor = new Color(255 / 255f, 255 / 255f, 102 / 255f); // Light Yellow
+    public Color lowDirectionColor = new Color(152 / 255f, 251 / 255f, 152 / 255f); // Pale Green
+    public Color highDirectionColor = new Color(238 / 255f, 130 / 255f, 238 / 255f); // Violet
+
+    private float sphereRadius = 0.5f;
+    private float lineHeight = 2.5f;
+    private float arcAngleStart = 0f;
+    private float arcAngleEnd = 1.5f;
+    private float smoothSpeed = 5f;
+    private string jsonFilePath = Application.dataPath + "/Scripts/Application/Json/Scripts.json";
+    public string title = "sound visualizer";
+    public bool shouldDraw = true;
+
+    public void GeneratedFunction(object[] soundData)
+    {
+        if (soundData != null)
+        {
+            if (soundData.Length >= 3)
+            {
+                string classification = soundData[0] as string;
+                float pitchData = (float)soundData[1];
+                float distance = (float)soundData[2];
+
+                // Update visualization parameters
+                volume = Mathf.Clamp01(1f / (distance + 1f)); 
+                pitch = pitchData;
+            }
+        }
+        else
+        {
+            Debug.Log("SoundData is null!");
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        // Update the radius of the sphere and the height of the line
+        sphereRadius = Mathf.Lerp(sphereRadius, 0.5f + 2f * volume, Time.deltaTime * smoothSpeed);
+        lineHeight = Mathf.Lerp(lineHeight, 2.5f + pitch, Time.deltaTime * smoothSpeed);
+        arcAngleEnd = Mathf.Lerp(arcAngleEnd, 1.5f * pitch, Time.deltaTime * smoothSpeed);
+    }
+
+    private void UpdateDrawingFlag()
+    {
+        try
+        {
+            string json = File.ReadAllText(jsonFilePath);
+            ScriptDataList data = UnityEngine.JsonUtility.FromJson<ScriptDataList>(json);
+
+            ScriptData scriptEntry = null;
+            foreach (ScriptData s in data.scripts)
+            {
+                if (s.userPrompt.Equals(title, StringComparison.OrdinalIgnoreCase))
+                {
+                    scriptEntry = s;
+                    break;
+                }
+            }
+
+            shouldDraw = scriptEntry != null ? scriptEntry.drawUI : true;
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error reading JSON: " + ex.Message);
+            shouldDraw = false;
+        }
+    }
+
+    public override void DrawShapes(Camera cam)
+    {
+        using (Draw.Command(cam))
+        {
+            UpdateDrawingFlag();
+
+            if (shouldDraw)
+            {
+                Draw.Sphere(Vector3.zero, sphereRadius, Color.Lerp(lowVolumeColor, highVolumeColor, volume));
+                Draw.Line(new Vector3(0, 0, 0), new Vector3(0, lineHeight, 0), Color.Lerp(lowPitchColor, highPitchColor, pitch));
+                Draw.Arc(new Vector3(0, lineHeight + 0.5f, 0), 1f, arcAngleStart, arcAngleEnd, Color.Lerp(lowDirectionColor, highDirectionColor, pitch));
+            }
+        }
+    }
+
+    public class SoundData
+    {
+        public float volume;
+        public float frequency;
+        public float pitch;
+    }
+
+    public class SoundDataList
+    {
+        public List<SoundData> soundDataList;
+    }
+
+    public class ScriptData
+    {
+        public string userPrompt;
+        public string scriptContent;
+        public bool drawUI;
+    }
+
+    public class ScriptDataList
+    {
+        public List<ScriptData> scripts = new List<ScriptData>();
+    }
+}

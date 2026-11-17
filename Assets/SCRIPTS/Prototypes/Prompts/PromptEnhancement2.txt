@@ -1,0 +1,68 @@
+Your goal is to enhance this prompt: <USER_PROMPT> using the following bulletpoints to 
+enhance the prompt:
+** Start the output with "Create a"
+** The necessary shapes required for the following user input are given 
+   * Rectangle, rings, arcs, triangle, sphere, LineRenderer
+** If there are multiple shapes of the same type, label them such as: 
+   * ring1, ring2, ring3,...  
+   * describe each of the shapes seperately like in the examples below
+** For each the shapes, describe each of the shapes. Features such as the following: 
+   * Their relative size and location
+   * color
+   * gradients
+   * transitions
+   * behaviors
+   * how are they placed relative to the other shapes for the UI
+** Color wise, you can only use the following colors: 
+   * black
+   * blue
+   * clear 
+   * cyan 
+   * gray 
+   * greem
+   * magenta
+   * red
+   * white
+   * yellow
+** Dynamic behavior that could go along with the user input given
+   * How should the UI be moving? Make sure to answer this question.  
+** Avoid being vague or giving incomplete descriptions 
+** Reference the good and bad examples provided below that emulate what we are looking for
+
+
+[Example #1] 
+User input: A volume bar 
+(Good example output): 
+Create a sound bar with the following shapes, features, dynamic behaviors and relationships:
+** pill-like outline 
+   * This will be the outline of the sound bar
+   * It will be black 
+   * It should be pilled shaped 
+   * It should be centered on the screen 
+   * It stays the same size 
+** retangle representing the volume it is recieving
+   * this will represent the volume that the sound bar is recieving 
+   * it increases and decreases in size as it gets louder or softer volume values 
+   * it will be vibrant in color and will go from red to green as the volume goes up 
+   * it should be within the pill-like outline
+** Text saying sound bar
+   * this will be the title for the sound bar 
+   * it is white in color 
+   * it should be at the top of the pill-like outline and rectangle representing the volume it is recieving 
+(Bad example output): 
+A bar 
+
+[Example #2]
+User input: A wave
+(Good example output): 
+Create a sound bar with the following shapes, features, dynamic behaviors and relationships:
+** Utilizes LineRenderer
+** Make a wave
+   * Utilizes a sinusoidal shape for the shape of the wave 
+   * Increases and decreases in ampiltude as the volume it receives changes 
+   * Make the wave look game-like and colorful 
+   * Make the wave look like it is flowing
+(Bad example output): 
+A wave
+
+

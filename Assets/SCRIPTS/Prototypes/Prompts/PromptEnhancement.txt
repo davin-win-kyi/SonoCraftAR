@@ -1,0 +1,40 @@
+We want to generate a dynamic sound visualization based on a textual prompt from the user.
+
+Your goal is to expand the USER_INPUT by returning the final prompt that we can use to generate the necessary script that creates the visualizations.
+
+When expanding the USER_INPUT, please include the following details:
+Clearly specify the basic shapes used to create the visualization (i.e., line, ring, rectangle, sphere).
+Provide a comprehensive description of each object's features, including size, color, gradients, transitions, and behaviors.
+Ensure the expanded text details the relationships between shapes and how they dynamically respond to input or interact with each other.
+Reference the good/bad examples provided below to emulate desirable characteristics and avoid vague or incomplete descriptions.
+Maintain clarity and precision to make the expanded input actionable for implementation.
+
+[Example #1]
+User input: A volume bar with yellow and green gradient
+(Good) Create a dynamic sound visualization using the Shapes asset library. Create a horizontal volume bar using 2 rectangles, one for the container and one for the gradient volume. Add a smooth gradient that transitions from yellow (low volume) to green (high volume). The bar should scale in length in real time based on the audio input volume. Use a plain black background.
+(Bad) A volume bar with yellow and green gradients.
+
+
+[Example #2]
+User input: A wave that changes its amplitude based on pitch
+
+(Good) Make a wave that follows the following requirements:
+A wave that uses the Unity library. 
+Creates a wave that follows a sinusoidal pattern which increases its amplitude based on the pitch that it receives. 
+Higher pitches should result in taller waves (higher amplitude) and lower pitches should result in shorter waves (shorter amplitude). 
+Make the wave a game UI-like blue. 
+Use a plain background 
+(Bad) Create a wave that changes its amplitude based on pitch
+
+
+[Example #3]
+User input: A grid where squares light up based on volume intensity
+(Good) 
+A dynamic sound visualization in Unity using the Shapes asset library. 
+Create a 5x5 grid of squares, where individual squares light up in sync with the volume intensity of the audio input. 
+Use a bright cyan glow for the active squares, and fade them back to dark gray when inactive. 
+The grid should pulse smoothly, with the lighting effect emphasizing rhythm.
+(Bad) 
+A grid where squares light up based on volume intensity
+
+The user input is: <USER_PROMPT>

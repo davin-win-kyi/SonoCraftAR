@@ -1,0 +1,113 @@
+using UnityEngine;
+using System.Collections.Generic;
+using Shapes;
+using Newtonsoft.Json;
+
+public class DynamicSoundWave : MonoBehaviour
+{
+    public string summary = "Dynamic audio-reactive sound wave using LineRenderer, adjusting wave height with volume.";
+    public bool shouldDraw = true;
+    private string jsonFilePath = "/Users/davinwinkyi/Documents/Sound-UI-Authoring/Assets/Scripts/Application/Json/Scripts.json";
+    public string title = "a wave";
+
+    public Color startColor = new Color(0f, 1f, 1f); // Cyan
+    public Color endColor = new Color(1f, 0f, 1f); // Magenta
+
+    private LineRenderer lineRenderer;
+    private float waveSpeed = 1f;
+    private float amplitude = 0.5f;
+    private float targetAmplitude = 0.5f;
+    private int pointsCount = 100;
+    private float[] points;
+    private float phase = 0f;
+    private float smoothSpeed = 5f;
+
+    void Start()
+    {
+        GameObject lineRendererObject = new GameObject("SoundWaveLineRenderer");
+        lineRenderer = lineRendererObject.AddComponent<LineRenderer>();
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.positionCount = pointsCount;
+
+        points = new float[pointsCount];
+        UpdateDrawingFlag();
+    }
+
+    public void GeneratedFunction(object[] soundData)
+    {
+        if (soundData != null && soundData.Length >= 3)
+        {
+            string classification = soundData[0] as string;
+            float pitch = (float)soundData[1];
+            float distance = (float)soundData[2];
+            float rawVolume = Mathf.Clamp01(1f / (distance + 1f));
+
+            targetAmplitude = Mathf.Lerp(0.1f, 1.0f, rawVolume);
+        }
+        else
+        {
+            Debug.Log("SoundData is null or its length is insufficient!");
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        amplitude = Mathf.Lerp(amplitude, targetAmplitude, Time.deltaTime * smoothSpeed);
+        phase += waveSpeed * Time.deltaTime;
+        for (int i = 0; i < pointsCount; i++)
+        {
+            float x = i / (float)(pointsCount - 1) * 2.0f * Mathf.PI;
+            float y = Mathf.Sin(x + phase) * amplitude;
+            points[i] = y;
+        }
+
+        Vector3[] positions = new Vector3[pointsCount];
+        for (int i = 0; i < pointsCount; i++)
+        {
+            positions[i] = new Vector3(i * 0.1f, points[i], 0);
+        }
+
+        lineRenderer.SetPositions(positions);
+        lineRenderer.startColor = startColor;
+        lineRenderer.endColor = endColor;
+    }
+
+    private void UpdateDrawingFlag()
+    {
+        try
+        {
+            string json = System.IO.File.ReadAllText(jsonFilePath);
+            ScriptDataList data = JsonConvert.DeserializeObject<ScriptDataList>(json);
+
+            ScriptData scriptEntry = data.scripts
+                .Find(s => s.userPrompt.Equals(title, System.StringComparison.OrdinalIgnoreCase));
+
+            shouldDraw = scriptEntry != null ? scriptEntry.drawUI : false;
+            Debug.Log("FLAG: " + shouldDraw);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.Log("Error reading JSON: " + ex.Message);
+            shouldDraw = false;
+        }
+    }
+
+    private void DrawShapes(Camera cam)
+    {
+        if (!shouldDraw) return;
+
+        Draw.Color = Color.blue;
+        Draw.LineGeometry = LineGeometry.Volumetric3D;
+        Draw.ThicknessSpace = ThicknessSpace.Pixels;
+        Draw.Thickness = 4.0f;
+
+        for (int i = 0; i < pointsCount - 1; i++)
+        {
+            Vector3 startPos = new Vector3(i * 0.1f, points[i], 0);
+            Vector3 endPos = new Vector3((i + 1) * 0.1f, points[i + 1], 0);
+            Draw.Line(startPos, endPos);
+        }
+    }
+}
